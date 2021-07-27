@@ -1,2 +1,3 @@
 # SideBlurredImage
-Android Image library to keep ratio using side blurred image
+=======
+Android Image library to make side blurred image keeping aspect ratio
