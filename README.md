@@ -9,5 +9,5 @@ Download the latest AAR from XXX repo or grab via Gradle: Not yet.
   
 
 ## License
-We are on GNU LGPL. 
-I hope it will be useful for your project.
+We are on GNU LGPL.   
+I hope it will be useful for your project.  
