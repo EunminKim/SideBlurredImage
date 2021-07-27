@@ -1,5 +1,5 @@
 # SideBlurredImage
-Android Image library to make side blurred image keeping aspect ratio
+Android Image library with blurred images on the sides to maintain image aspect ratio
 
 ## Download
 Download the latest AAR from XXX repo or grab via Gradle: Not yet
