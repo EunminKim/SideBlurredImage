@@ -13,49 +13,69 @@ object SideBlurredImage {
                 radius: Float): Bitmap {
         if (radius <= 0 || radius > 25) return bitmap
 
+        // Resize the bitmap to set center image keeping aspect ratio
         val centerImage = resize(bitmap, destWidthPx, destHeightPx)
 
-        val frameRatio = if (centerImage.width > centerImage.height) {
+        // Calculate frame and image aspect ratio
+        val frameRatio = if (destWidthPx > destHeightPx) {
             destWidthPx.toFloat() / destHeightPx
         } else {
             destHeightPx / destWidthPx.toFloat()
         }
+        val imageRatio = if (centerImage.width > centerImage.height) {
+            centerImage.width.toFloat() / centerImage.height
+        } else {
+            centerImage.height / centerImage.width.toFloat()
+        }
+
+        // Crop the bitmap to set background image keeping aspect ratio
         val cropped = if (destWidthPx > destHeightPx) {
-            val imageRatio = centerImage.width.toFloat() /centerImage.height
             if (centerImage.width > centerImage.height) {
                 if (imageRatio > frameRatio) {
-                    cropCenterBitmap(centerImage, (centerImage.height * frameRatio).toInt(), centerImage.height)
+                    centerCrop(centerImage, (centerImage.height * frameRatio).toInt(),
+                        centerImage.height)
                 } else {
-                    cropCenterBitmap(centerImage, centerImage.width, (centerImage.width / frameRatio).toInt())
+                    centerCrop(centerImage, centerImage.width,
+                        (centerImage.width / frameRatio).toInt())
                 }
             } else {
-                cropCenterBitmap(centerImage, centerImage.width, (centerImage.width * frameRatio).toInt())
+                centerCrop(centerImage, centerImage.width,
+                    (centerImage.width / frameRatio).toInt())
             }
         } else if (destWidthPx == destHeightPx) {
             if (centerImage.width > centerImage.height) {
-                cropCenterBitmap(centerImage, centerImage.height, centerImage.width)
+                centerCrop(centerImage, centerImage.height, centerImage.width)
             } else {
-                cropCenterBitmap(centerImage, centerImage.width, centerImage.width)
+                centerCrop(centerImage, centerImage.width, centerImage.width)
             }
         } else {
-            val imageRatio = centerImage.height / centerImage.width.toFloat()
             if (centerImage.width > centerImage.height) {
-                cropCenterBitmap(centerImage, (centerImage.height * frameRatio).toInt(), centerImage.height)
+                centerCrop(centerImage, (centerImage.height / frameRatio).toInt(),
+                    centerImage.height)
             } else {
                 if (imageRatio > frameRatio) {
-                    cropCenterBitmap(centerImage, centerImage.width, (centerImage.width * frameRatio).toInt())
+                    centerCrop(centerImage, centerImage.width,
+                        (centerImage.width * frameRatio).toInt())
                 } else {
-                    cropCenterBitmap(centerImage, (centerImage.height / frameRatio).toInt(), centerImage.height)
+                    centerCrop(centerImage, (centerImage.height / frameRatio).toInt(),
+                        centerImage.height)
                 }
             }
         }
+
+        // Scale and Blur background image
         val scaled = resize(cropped, destWidthPx, destHeightPx)
         val background = blur(context, scaled, radius)
 
+        // Put the actual image on top of the blurred background image
         val canvas = Canvas(background)
-        val centreX = (background.width - centerImage.width).toFloat() / 2
-        val centreY = (background.height - centerImage.height).toFloat() / 2
-        canvas.drawBitmap(centerImage, centreX, centreY, null)
+        val centerX = (background.width - centerImage.width).toFloat() / 2
+        val centerY = (background.height - centerImage.height).toFloat() / 2
+        canvas.drawBitmap(centerImage, centerX, centerY, null)
+
+        // Recycle unused bitmaps
+        cropped.recycle()
+        centerImage.recycle()
 
         return background
     }
@@ -71,40 +91,39 @@ object SideBlurredImage {
         return bitmap
     }
 
-    private fun cropCenterBitmap(src: Bitmap, w: Int, h: Int): Bitmap {
-        val width = src.width
-        val height = src.height
+    private fun centerCrop(source: Bitmap, destWidth: Int, destHeight: Int): Bitmap {
+        val width = source.width
+        val height = source.height
 
-        if (width < w && height < h) return src
+        if (width < destWidth && height < destHeight) return source
 
         var x = 0
         var y = 0
-        if (width > w) x = (width - w) / 2
-        if (height > h) y = (height - h) / 2
+        if (width > destWidth) x = (width - destWidth) / 2
+        if (height > destHeight) y = (height - destHeight) / 2
 
-        var cw = w
-        var ch = h
-        if (w > width) cw = width;
-        if (h > height) ch = height;
+        var smallestWidth = destWidth
+        var smallestHeight = destHeight
+        if (destWidth > width) smallestWidth = width
+        if (destHeight > height) smallestHeight = height
 
-        return Bitmap.createBitmap(src, x, y, cw, ch);
+        return Bitmap.createBitmap(source, x, y, smallestWidth, smallestHeight)
     }
 
-    private fun resize(image: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
-        if (maxHeight > 0 && maxWidth > 0) {
-            val width = image.width
-            val height = image.height
-            val ratioBitmap = width.toFloat() / height.toFloat()
-            val ratioMax = maxWidth.toFloat() / maxHeight.toFloat()
-            var finalWidth = maxWidth
-            var finalHeight = maxHeight
-            if (ratioMax > ratioBitmap) {
-                finalWidth = (maxHeight.toFloat() * ratioBitmap).toInt()
-            } else {
-                finalHeight = (maxWidth.toFloat() / ratioBitmap).toInt()
-            }
-            return Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true)
+    private fun resize(source: Bitmap, targetWidth: Int, targetHeight: Int): Bitmap {
+        if (targetHeight <= 0 || targetWidth <= 0) return source
+
+        val width = source.width
+        val height = source.height
+        val sourceRatio = width.toFloat() / height.toFloat()
+        val targetRatio = targetWidth.toFloat() / targetHeight.toFloat()
+        var scaledWidth = targetWidth
+        var scaledHeight = targetHeight
+        if (targetRatio > sourceRatio) {
+            scaledWidth = (targetHeight.toFloat() * sourceRatio).toInt()
+        } else {
+            scaledHeight = (targetWidth.toFloat() / sourceRatio).toInt()
         }
-        return image
+        return Bitmap.createScaledBitmap(source, scaledWidth, scaledHeight, true)
     }
 }
