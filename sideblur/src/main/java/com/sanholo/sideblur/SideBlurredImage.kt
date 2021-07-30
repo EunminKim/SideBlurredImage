@@ -64,7 +64,7 @@ object SideBlurredImage {
         }
 
         // Scale and Blur background image
-        val scaled = resize(cropped, destWidthPx, destHeightPx)
+        val scaled = forceResize(cropped, destWidthPx, destHeightPx)
         val background = blur(context, scaled, radius)
 
         // Put the actual image on top of the blurred background image
@@ -110,6 +110,13 @@ object SideBlurredImage {
         return Bitmap.createBitmap(source, x, y, smallestWidth, smallestHeight)
     }
 
+    private fun forceResize(source: Bitmap, targetWidth: Int, targetHeight: Int): Bitmap {
+        if (targetHeight <= 0 || targetWidth <= 0) return source
+        val resized = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, true)
+        source.recycle()
+        return resized
+    }
+
     private fun resize(source: Bitmap, targetWidth: Int, targetHeight: Int): Bitmap {
         if (targetHeight <= 0 || targetWidth <= 0) return source
 
@@ -124,6 +131,8 @@ object SideBlurredImage {
         } else {
             scaledHeight = (targetWidth.toFloat() / sourceRatio).toInt()
         }
-        return Bitmap.createScaledBitmap(source, scaledWidth, scaledHeight, true)
+        val scaled = Bitmap.createScaledBitmap(source, scaledWidth, scaledHeight, true)
+        source.recycle()
+        return scaled
     }
 }
