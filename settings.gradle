@@ -1,2 +1,2 @@
-rootProject.name = "SideBlurredImage"
+rootProject.name = "sideblur"
 include ':sideblur'
