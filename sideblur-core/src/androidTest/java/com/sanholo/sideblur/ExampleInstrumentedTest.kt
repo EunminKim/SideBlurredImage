@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.sanholo.sideblur.test", appContext.packageName)
+        assertEquals("com.sanholo.sideblur-core.test", appContext.packageName)
     }
 }

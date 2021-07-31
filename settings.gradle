@@ -1,2 +1,2 @@
 rootProject.name = "sideblur"
-include ':sideblur'
+include ':sideblur-core'
