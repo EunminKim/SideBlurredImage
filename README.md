@@ -5,7 +5,7 @@ Android Image library to make blurred images on the sides maintaining image aspe
 
 
 ## Download
-Download the latest AAR from Jitpack repo or grab via Gradle:
+Grab via Gradle from jitpack repo:
 Step 1. Add it in your root build.gradle at the end of repositories:
 ```
 allprojects {
