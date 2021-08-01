@@ -1,2 +1,3 @@
 rootProject.name = "SideBlurredImage"
 include ':sideblur'
+include ':sideblur-sample'
