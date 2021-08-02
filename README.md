@@ -24,6 +24,11 @@ dependencies {
 
   
 
+## How to use
+```
+var converted = SideBlurredImage.convert(bitmap, frameWidth, frameHeight))
+```
+
 ## License
 We are on GNU LGPL.   
 I hope it will be useful for your project.  
