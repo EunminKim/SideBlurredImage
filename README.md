@@ -26,7 +26,7 @@ dependencies {
 
 ## How to use
 ```
-var converted = SideBlurredImage.convert(bitmap, frameWidth, frameHeight))
+var converted = SideBlurredImage.convert(bitmap, frameWidth, frameHeight)
 ```
 
 ## License
